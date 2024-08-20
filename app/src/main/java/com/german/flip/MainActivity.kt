@@ -38,8 +38,8 @@ class MainActivity : AppCompatActivity() {
         flip.setOnClickListener{
             if(isFront)
             {
-                front_animation.setTarget(front);
-                back_animation.setTarget(back);
+                front_animation.setTarget(front)
+                back_animation.setTarget(back)
                 front_animation.start()
                 back_animation.start()
                 isFront = false
