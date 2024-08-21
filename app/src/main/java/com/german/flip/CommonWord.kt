@@ -5,8 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class CommonWord(
-    @PrimaryKey(autoGenerate = false)
-    val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
 
     val germanWord: String,
     val englishWord: String,
