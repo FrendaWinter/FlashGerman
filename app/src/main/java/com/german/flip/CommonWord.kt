@@ -3,9 +3,9 @@ package com.german.flip
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "CommonWord")
 data class CommonWord(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     val id: Int = 0,
 
     val germanWord: String,
