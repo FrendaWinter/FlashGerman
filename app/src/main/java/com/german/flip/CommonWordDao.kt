@@ -16,6 +16,9 @@ interface CommonWordDao {
     @Delete
     suspend fun deleteWord(word: CommonWord)
 
+    @Query("Select * from commonword where id = :id")
+    fun getWordById(id: Int): CommonWord
+
     @Query("Select * from commonword order by id asc")
     fun getWordOrderById(): List<CommonWord>
 
