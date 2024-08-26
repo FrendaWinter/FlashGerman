@@ -6,11 +6,13 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import androidx.compose.material3.Text
 import android.widget.TextView
 import android.widget.Button
+import androidx.activity.ComponentActivity
 import androidx.room.Room
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     private lateinit var frontAnimation: AnimatorSet
     private lateinit var backAnimation: AnimatorSet
     private var isFront =true
