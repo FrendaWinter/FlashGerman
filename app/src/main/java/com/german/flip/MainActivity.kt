@@ -1,78 +1,101 @@
 package com.german.flip
 
-import android.animation.AnimatorInflater
-import android.animation.AnimatorSet
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import android.util.Log
-import androidx.compose.material3.Text
-import android.widget.TextView
-import android.widget.Button
 import androidx.activity.ComponentActivity
-import androidx.room.Room
+import androidx.compose.material3.Text
+import androidx.compose.material3.Card
+import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.tooling.preview.Preview
 
 class MainActivity : ComponentActivity() {
-    private lateinit var frontAnimation: AnimatorSet
-    private lateinit var backAnimation: AnimatorSet
-    private var isFront =true
-
-    private var index = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-
-        val db = Room.databaseBuilder(
-            applicationContext,
-            CommonWordDB::class.java, "CommonWords"
-        ).createFromAsset("database/CommonWord.db").allowMainThreadQueries().build()
-
-        val scale = applicationContext.resources.displayMetrics.density
-
-        val front = findViewById<TextView>(R.id.card_front) as TextView
-        val back =findViewById<TextView>(R.id.card_back) as TextView
-        val flip = findViewById<Button>(R.id.flip_btn) as Button
-        val next = findViewById<Button>(R.id.next_btn) as Button
-
-        val item = db.dao.getWordById(index)
-        front.text = item.germanWord
-        back.text = item.englishWord
-
-        front.cameraDistance = 8000 * scale
-        back.cameraDistance = 8000 * scale
-
-        // Now we will set the front animation
-        frontAnimation = AnimatorInflater.loadAnimator(applicationContext, R.animator.front_animator) as AnimatorSet
-        backAnimation = AnimatorInflater.loadAnimator(applicationContext, R.animator.back_animator) as AnimatorSet
-
-        // Now we will set the event listener
-        flip.setOnClickListener{
-            if(isFront)
-            {
-                frontAnimation.setTarget(front);
-                backAnimation.setTarget(back);
-                frontAnimation.start()
-                backAnimation.start()
-                isFront = false
-
-            }
-            else
-            {
-                frontAnimation.setTarget(back)
-                backAnimation.setTarget(front)
-                backAnimation.start()
-                frontAnimation.start()
-                isFront =true
-
-            }
-        }
-
-        next.setOnClickListener{
-            index += 1
-            val item = db.dao.getWordById(index)
-            front.text = item.germanWord
-            back.text = item.englishWord
+        setContent {
+            FlashCard()
         }
     }
+}
+
+@Composable
+fun FlashCard() {
+
+    var rotated by remember { mutableStateOf(false) }
+
+    val rotation by animateFloatAsState(
+        targetValue = if (rotated) 180f else 0f,
+        animationSpec = tween(500), label = ""
+    )
+
+    val animateFront by animateFloatAsState(
+        targetValue = if (!rotated) 1f else 0f,
+        animationSpec = tween(500), label = ""
+    )
+
+    val animateBack by animateFloatAsState(
+        targetValue = if (rotated) 1f else 0f,
+        animationSpec = tween(500), label = ""
+    )
+
+    val animateColor by animateColorAsState(
+        targetValue = if (rotated) Color.Red else Color.Blue,
+        animationSpec = tween(500), label = ""
+    )
+
+    Box(
+        Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxSize(.5f)
+                .graphicsLayer {
+                    rotationY = rotation
+                    cameraDistance = 8 * density
+                }
+                .clickable {
+                    rotated = !rotated
+                },
+            colors = CardDefaults.cardColors(containerColor = animateColor)
+        )
+        {
+            Column(
+                Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+
+                Text(text = if (rotated) "Back" else "Front",
+                    modifier = Modifier
+                        .graphicsLayer {
+                            alpha = if (rotated) animateBack else animateFront
+                            rotationY = rotation
+                        })
+            }
+
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    FlashCard()
 }

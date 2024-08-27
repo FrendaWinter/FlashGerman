@@ -22,6 +22,10 @@ android {
         compose = true
     }
 
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.2"
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -56,16 +60,21 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
-    val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
+    // Compose BOM (Bill of Materials) to manage versions
+    implementation(platform(libs.androidx.compose.bom)) // Adjust to the latest BOM version
 
-    implementation(libs.androidx.material3)
-    // Android Studio Preview support
-    implementation(libs.androidx.ui.tooling.preview)
-    debugImplementation(libs.androidx.ui.tooling)
+    // Core Compose libraries
+    implementation(libs.androidx.ui)
+    implementation(libs.material3)
+    implementation(libs.ui.tooling.preview)
 
-    // UI Tests
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    // Optional dependencies
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.test.manifest)
+
+    // For AndroidX Activity support
+    implementation(libs.activity.compose)
+
+    // For ViewModel support
+    implementation(libs.lifecycle.viewmodel.compose)
 }
