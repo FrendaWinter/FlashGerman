@@ -6,24 +6,34 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Card
 import androidx.activity.compose.setContent
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -36,7 +46,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.room.Room
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,10 +66,42 @@ class MainActivity : ComponentActivity() {
 
             Column(
                 Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                FlashCard(germanWord, englishWord)
+                Row (
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(50.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = { }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "Menu Icon",
+                            modifier = Modifier.size(48.dp), // Custom size
+                            tint = Color.White // Custom color
+                        )
+                    }
+                    Button(
+                        onClick = {  }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Settings Icon",
+                            modifier = Modifier.size(48.dp), // Set the size of the icon
+                            tint = Color.White // Change the icon color if needed
+                        )
+                    }
+                }
+                Column (
+                    Modifier.fillMaxHeight(.75f)
+                ) {
+                    FlashCard(germanWord, englishWord)
+                }
+
+                Spacer(modifier = Modifier.padding(20.dp))
                 NextButton(onClick = {
                     index++
                     println(index)
@@ -94,33 +138,61 @@ fun FlashCard(germanWord: String, englishWord: String) {
         animationSpec = tween(500), label = ""
     )
 
+    // State to track whether the card is expanded or not
+    var isExpanded by remember { mutableStateOf(false) }
+
+    // Animate the card's height based on the expanded state
+    val cardHeight by animateFloatAsState(
+        targetValue = if (isExpanded) 1f else .5f,
+        label = "" // Change these values as needed
+    )
+
     Card(
         modifier = Modifier
-            .fillMaxSize(.5f)
+            .fillMaxWidth(.75f)
+            .fillMaxHeight(cardHeight)
             .graphicsLayer {
                 rotationY = rotation
                 cameraDistance = 8 * density
             }
             .clickable {
                 rotated = !rotated
-            },
+                isExpanded = !isExpanded
+            }
+        ,
         colors = CardDefaults.cardColors(containerColor = animateColor)
     )
     {
         Column(
             Modifier
-                .fillMaxSize()
-                .weight(1f, false),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = if (rotated) englishWord else germanWord,
-                modifier = Modifier
-                    .graphicsLayer {
-                        alpha = if (rotated) animateBack else animateFront
-                        rotationY = rotation
-                    }
-            )
+            Box (
+                modifier = Modifier.fillMaxHeight(.75f),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if (rotated) englishWord else germanWord,
+                    modifier = Modifier
+                        .graphicsLayer {
+                            alpha = if (rotated) animateBack else animateFront
+                            rotationY = rotation
+                        },
+                    fontSize = 30.sp
+                )
+            }
+
+            Button(
+                onClick = {  }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = "Settings Icon",
+                    modifier = Modifier.size(48.dp), // Set the size of the icon
+                    tint = Color.White // Change the icon color if needed
+                )
+            }
         }
     }
 }
@@ -133,7 +205,7 @@ fun NextButton(onClick: () -> Unit) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Favorite Icon",
-            modifier = Modifier.size(24.dp), // Set the size of the icon
+            modifier = Modifier.size(48.dp), // Set the size of the icon
             tint = Color.White // Change the icon color if needed
         )
     }
@@ -144,11 +216,42 @@ fun NextButton(onClick: () -> Unit) {
 fun GreetingPreview() {
     Column(
         Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        FlashCard("Hallo", "Hello")
-        Spacer(modifier = Modifier.padding(100 .dp))
+        Row (
+            Modifier
+                .fillMaxWidth()
+                .padding(50.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(
+                onClick = { }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = "Menu Icon",
+                    modifier = Modifier.size(48.dp), // Custom size
+                    tint = Color.White // Custom color
+                )
+            }
+            Button(
+                onClick = {  }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Settings Icon",
+                    modifier = Modifier.size(48.dp), // Set the size of the icon
+                    tint = Color.White // Change the icon color if needed
+                )
+            }
+        }
+        Column (
+            Modifier.fillMaxHeight(.75f)
+        ) {
+            FlashCard("Hallo", "Hello")
+        }
+
+        Spacer(modifier = Modifier.padding(20.dp))
         NextButton(onClick = {
             // Handle the button click here
             println("Button Clicked!")
