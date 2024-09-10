@@ -48,7 +48,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.room.Room
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -157,7 +156,6 @@ fun FlashCard(germanWord: String, englishWord: String) {
             }
             .clickable {
                 rotated = !rotated
-                isExpanded = !isExpanded
             }
         ,
         colors = CardDefaults.cardColors(containerColor = animateColor)
@@ -170,7 +168,7 @@ fun FlashCard(germanWord: String, englishWord: String) {
         ) {
             Box (
                 modifier = Modifier.fillMaxHeight(.75f),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.BottomEnd
             ) {
                 Text(
                     text = if (rotated) englishWord else germanWord,
@@ -178,20 +176,29 @@ fun FlashCard(germanWord: String, englishWord: String) {
                         .graphicsLayer {
                             alpha = if (rotated) animateBack else animateFront
                             rotationY = rotation
-                        },
+                        }
+                        .padding(50.dp),
                     fontSize = 30.sp
                 )
             }
 
-            Button(
-                onClick = {  }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = "Settings Icon",
-                    modifier = Modifier.size(48.dp), // Set the size of the icon
-                    tint = Color.White // Change the icon color if needed
-                )
+            if (rotated) {
+                Button(
+                    modifier = Modifier
+                        .graphicsLayer {
+                            rotationY = rotation
+                        },
+                    onClick = {
+                        isExpanded = !isExpanded
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = "Settings Icon",
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.White
+                    )
+                }
             }
         }
     }
@@ -205,8 +212,8 @@ fun NextButton(onClick: () -> Unit) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Favorite Icon",
-            modifier = Modifier.size(48.dp), // Set the size of the icon
-            tint = Color.White // Change the icon color if needed
+            modifier = Modifier.size(48.dp),
+            tint = Color.White
         )
     }
 }
